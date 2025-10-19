@@ -1,0 +1,131 @@
+{% extends "app_productos/base.html" %}
+
+{% block body %}
+{% load static %}
+<!--Título de la sección-->
+        <h3 class="m-4">Todos los Productos</h3>
+        <div class="row">
+            <div class="col-12">
+
+                <!--Verificación de existencia de productos-->
+                {% if productos %}
+                    <div class="card bg-light ms-4 me-4 mb-4">
+
+                        <div class="card-header">
+                            <!--Ícono de lista de Font Awesome-->
+                            <i class="fa-solid fa-list fa-lg"></i> Registro de Productos  
+                        </div>
+
+                        <!--Cuerpo de la tarjeta-->
+                        <div class="card-body">
+                            <p class="card-text">
+                                
+                                <!--Tabla Responsiva-->
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <!--Encabezado de la tabla-->
+                                            <tr>
+                                                <th scope="col">nombre</th>
+                                                <th scope="col">categoria</th>
+                                                <th scope="col">precio</th>
+                                                <th scope="col">stock</th>
+                                                <th scope="col">unidad_medida</th>
+                                                <th scope="col"> Acciones </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!--Iteración sobre los productos-->
+                                            {% for producto in productos %}
+                                                <tr>
+                                                    <td>{{ producto.nombre}}</td>
+                                                    <td>{{ producto.categoria}}</td>
+                                                    <td>{{ producto.precio}}</td>
+                                                    <td>{{ producto.stock}}</td>
+                                                    <td>{{ producto.unidad_medida}}</td>
+                                                    <td>
+                                                        <!-- Botón para ver detalles del producto -->
+                                                        <button type="button" class="btn btn-success me-1" data-bs-toggle="modal" data-bs-target="#modalDetallesProducto_{{producto.id}}">
+                                                            <i class="fa-solid fa-circle-info fa-lg"></i> Ver
+                                                        </button>
+
+                                                        <!-- Modal para ver detalles del producto -->
+                                                        <!-- Asegúrate de que el ID del modal sea único y coincida con data-bs-target -->
+                                                        <div class="modal fade" id="modalDetallesProducto_{{producto.id}}" tabindex="-1" aria-labelledby="modalDetallesProductoLabel_{{producto.id}}" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+
+                                                                <!-- Contenido del modal -->
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="modalDetallesProductoLabel_{{producto.id}}">
+                                                                            Detalles del Producto: {{ producto.nombre}}
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <ul class="list-unstyled">
+                                                                            <li>Nombre de Producto: <strong>{{ producto.nombre}}</strong></li>
+                                                                            <li>Categoría: <strong>{{ producto.categoria}}</strong></li>
+                                                                            <li>Precio: <strong>{{ producto.precio}}</strong></li>
+                                                                            <li>Stock: <strong>{{ producto.stock}}</strong></li>
+                                                                            <li>Unidad de Medida: <strong>{{ producto.unidad_medida}}</strong></li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <a class="btn btn-warning me-1" href="{% url 'edit' producto.id %}"> 
+                                                            <i class="fa-solid fa-pen-to-square fa-lg"></i> Editar
+                                                        </a>
+
+                                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal_{{producto.id}}">
+                                                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar
+                                                        </button>
+
+                                                        <!-- Modal de confirmación de eliminación -->
+                                                        <!-- ¡CORRECCIÓN AQUÍ! ID del modal y data-bs-target deben coincidir y ser válidos -->
+                                                         <div class="modal fade" id="deleteModal_{{producto.id}}" tabindex="-1" aria-labelledby="deleteModalLabel_{{producto.id}}" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+
+                                                                <!-- Contenido del modal -->
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="deleteModalLabel_{{producto.id}}">
+                                                                            Eliminar Producto: {{ producto.nombre}}
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p>¿Estás seguro de que deseas eliminar el producto <strong>{{ producto.nombre }}</strong>?</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <!-- ¡CORRECCIÓN AQUÍ! Pasar el ID del producto a la URL 'delete' -->
+                                                                        <form action="{% url 'delete' producto.id %}" method="POST">
+                                                                            {% csrf_token %}
+                                                                            <!-- ¡CORRECCIÓN AQUÍ! Texto del botón más amigable -->
+                                                                            <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+                                                                        </form>
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info ms-4 me-4" role="alert"> No hay productos disponibles. </div>
+                {% endif %}
+            </div>
+        </div>
+{% endblock %}
